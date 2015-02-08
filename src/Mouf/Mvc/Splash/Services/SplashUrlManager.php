@@ -38,6 +38,9 @@ class SplashUrlManager {
 	 * (so using the getUrlsByProxy method).
 	 */
 	public static function getUrlsDirect() {
+
+		// FIXME: problem here: we don't have a MoufManager anymore!!!!
+
 		$moufManager = MoufManager::getMoufManager();
 		$instanceNames = $moufManager->findInstances("Mouf\\Mvc\\Splash\\Services\\UrlProviderInterface");
 		

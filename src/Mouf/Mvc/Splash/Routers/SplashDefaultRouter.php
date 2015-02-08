@@ -1,6 +1,9 @@
 <?php
 namespace Mouf\Mvc\Splash\Routers;
 
+use Mouf\MoufContainer;
+use Mouf\Mvc\Splash\Filters\FilterRepository;
+use Mouf\Mvc\Splash\Services\UrlProviderInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,15 +37,31 @@ class SplashDefaultRouter implements HttpKernelInterface {
 	 * @var HttpKernelInterface
 	 */
 	private $fallBackRouter;
-	
+
+	/**
+	 * The container to search controllers in
+	 * @var MoufContainer
+	 */
+	private $container;
+
+	/**
+	 * The repository containing all applicable filters.
+	 * @var FilterRepository
+	 */
+	private $filterRepository;
+
 	/**
 	 * @Important
 	 * @param HttpKernelInterface $fallBackRouter Router used if no page is found for this controller.
+	 * @param MoufContainer $container The container that will be queried for controllers instances.
+	 * @param FilterRepository $filterRepository The repository containing all applicable filters.
 	 * @param CacheInterface $cacheService Splash uses the cache service to store the URL mapping (the mapping between a URL and its controller/action)
 	 * @param LoggerInterface $log The logger used by Splash
 	 */
-	public function __construct(HttpKernelInterface $fallBackRouter, CacheInterface $cacheService = null, LoggerInterface $log = null){
+	public function __construct(HttpKernelInterface $fallBackRouter, MoufContainer $container, FilterRepository $filterRepository, CacheInterface $cacheService = null, LoggerInterface $log = null){
 		$this->fallBackRouter = $fallBackRouter;
+		$this->container = $container;
+		$this->filterRepository = $filterRepository;
 		$this->cacheService = $cacheService;
 		$this->log = $log;
 	}
@@ -105,7 +124,7 @@ class SplashDefaultRouter implements HttpKernelInterface {
 			return $this->fallBackRouter->handle($request, $type, $catch);
 		}
 			
-		$controller = MoufManager::getMoufManager()->getInstance($splashRoute->controllerInstanceName);
+		$controller = $this->container->get($splashRoute->controllerInstanceName);
 		$action = $splashRoute->methodName;
 		
 		$context->setUrlParameters($splashRoute->filledParameters);
@@ -121,7 +140,7 @@ class SplashDefaultRouter implements HttpKernelInterface {
 	
 		if ($controller instanceof WebServiceInterface) {
 			// FIXME: handle correctly webservices (or remove this exception and handle
-			// webservice the way we handle controllers
+			// webservice the way we handle controllers)
 			$response = SplashUtils::buildControllerResponse(
 				function() use ($controller){
 					$this->handleWebservice($controller);
@@ -153,7 +172,10 @@ class SplashDefaultRouter implements HttpKernelInterface {
 			for ($i=count($filters)-1; $i>=0; $i--) {
 				$filters[$i]->beforeAction();
 			}
-				
+
+			$splashInteralRouter = new SplashInternalRouter($controller, $action, $args);
+
+
 			$response = SplashUtils::buildControllerResponse(
 				function() use ($controller, $action, $args){
 					return call_user_func_array(array($controller,$action), $args);
@@ -188,15 +210,14 @@ class SplashDefaultRouter implements HttpKernelInterface {
 	 * @return array<SplashAction>
 	 */
 	private function getSplashActionsList() {
-		$moufManager = MoufManager::getMoufManager();
-		$instanceNames = $moufManager->findInstances("Mouf\\Mvc\\Splash\\Services\\UrlProviderInterface");
+		$instanceNames = $this->container->findInstances("Mouf\\Mvc\\Splash\\Services\\UrlProviderInterface");
 	
 		$urls = array();
 	
 		foreach ($instanceNames as $instanceName) {
-			$urlProvider = $moufManager->getInstance($instanceName);
+			$urlProvider = $this->container->get($instanceName);
 			/* @var $urlProvider UrlProviderInterface */
-			$tmpUrlList = $urlProvider->getUrlsList();
+			$tmpUrlList = $urlProvider->getUrlsList($this->container);
 			$urls = array_merge($urls, $tmpUrlList);
 		}
 	

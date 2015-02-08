@@ -1,6 +1,7 @@
 <?php
 namespace Mouf\Mvc\Splash;
 
+use Mouf\MoufContainer;
 use Mouf\Mvc\Splash\Controllers\Controller;
 
 use Mouf\Utils\Action\ActionInterface;
@@ -47,8 +48,8 @@ class Route implements UrlProviderInterface {
 	 *
 	 * @return array<SplashRoute>
 	 */
-	function getUrlsList() {
-		$instanceName = MoufManager::getMoufManager()->findInstanceName($this);
+	public function getUrlsList(MoufContainer $container) {
+		$instanceName = $container->findInstanceName($this);
 		
 		$route = new SplashRoute($this->url, $instanceName, "action", null, null);
 		return array($route);

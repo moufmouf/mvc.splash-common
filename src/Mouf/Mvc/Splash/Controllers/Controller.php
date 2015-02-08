@@ -2,6 +2,7 @@
 namespace Mouf\Mvc\Splash\Controllers;
 
 use Mouf\Annotations\URLAnnotation;
+use Mouf\MoufContainer;
 use Mouf\Reflection\MoufReflectionMethod;
 
 use Mouf\Mvc\Splash\Services\SplashRoute;
@@ -20,9 +21,6 @@ use Mouf\Mvc\Splash\Services\UrlProviderInterface;
 
 use Mouf\Html\HtmlElement\Scopable;
 
-/*require_once dirname(__FILE__)."/../views/404.php";
-require_once dirname(__FILE__)."/../views/500.php";
-require_once ROOT_PATH.'mouf/reflection/MoufReflectionClass.php';*/
 
 abstract class Controller implements Scopable, UrlProviderInterface {
 	
@@ -71,14 +69,13 @@ abstract class Controller implements Scopable, UrlProviderInterface {
 	 * 
 	 * @return array<SplashRoute>
 	 */
-	public function getUrlsList() {		
+	public function getUrlsList(MoufContainer $container) {
 		// Let's analyze the controller and get all the @Action annotations:
 		$urlsList = array();
-		$moufManager = MoufManager::getMoufManager();
-		
+
 		$refClass = new MoufReflectionClass(get_class($this));
-        $instanceName = $moufManager->findInstanceName($this);
-        $instance = $moufManager->getInstanceDescriptor($instanceName);
+        $instanceName = $container->findInstanceName($this);
+        $instance = $container->getInstanceDescriptor($instanceName);
 		
 		foreach ($refClass->getMethods() as $refMethod) {
 			/* @var $refMethod MoufReflectionMethod */
@@ -98,13 +95,13 @@ abstract class Controller implements Scopable, UrlProviderInterface {
 			if ($refMethod->hasAnnotation('Action')) {
 				$methodName = $refMethod->getName(); 
 				if ($methodName == "index" || $methodName == "defaultAction") {
-					$url = $moufManager->findInstanceName($this)."/";
+					$url = $container->findInstanceName($this)."/";
 				} else {
-					$url = $moufManager->findInstanceName($this)."/".$methodName;
+					$url = $container->findInstanceName($this)."/".$methodName;
 				}
 				$parameters = SplashUtils::mapParameters($refMethod);
 				$filters = FilterUtils::getFilters($refMethod, $this);
-				$urlsList[] = new SplashRoute($url, $moufManager->findInstanceName($this), $refMethod->getName(), $title, $refMethod->getDocCommentWithoutAnnotations(), $refMethod->getDocComment(), $this->getSupportedHttpMethods($refMethod), $parameters, $filters);
+				$urlsList[] = new SplashRoute($url, $container->findInstanceName($this), $refMethod->getName(), $title, $refMethod->getDocCommentWithoutAnnotations(), $refMethod->getDocComment(), $this->getSupportedHttpMethods($refMethod), $parameters, $filters);
 			}
 
 			// Now, let's check the "URL" annotation (note: we support multiple URL annotations for the same method)
