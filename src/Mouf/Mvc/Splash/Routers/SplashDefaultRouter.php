@@ -169,22 +169,25 @@ class SplashDefaultRouter implements HttpKernelInterface {
 			$filters = $splashRoute->filters;
 	
 			// Apply filters
-			for ($i=count($filters)-1; $i>=0; $i--) {
+			/*for ($i=count($filters)-1; $i>=0; $i--) {
 				$filters[$i]->beforeAction();
-			}
+			}*/
 
 			$splashInteralRouter = new SplashInternalRouter($controller, $action, $args);
 
+			$router = $this->filterRepository->getFilteredInternalRouter($splashInteralRouter, $controller, $action);
 
-			$response = SplashUtils::buildControllerResponse(
+			$response = $router->handle($request, $type, $catch);
+
+			/*$response = SplashUtils::buildControllerResponse(
 				function() use ($controller, $action, $args){
 					return call_user_func_array(array($controller,$action), $args);
 				}
-			);
+			);*/
 				
-			foreach ($filters as $filter) {
+			/*foreach ($filters as $filter) {
 				$filter->afterAction();
-			}
+			}*/
 			
 			return $response;
 		}

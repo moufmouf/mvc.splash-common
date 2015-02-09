@@ -51,8 +51,8 @@ class SplashInternalRouter implements HttpKernelInterface {
 	 */
 	public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true){
 		return SplashUtils::buildControllerResponse(
-			function() use ($controller, $action, $args){
-				return call_user_func_array(array($controller,$action), $args);
+			function() {
+				return call_user_func_array(array($this->controller,$this->action), $this->args);
 			}
 		);
 	}
