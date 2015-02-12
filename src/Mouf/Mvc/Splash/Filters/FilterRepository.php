@@ -35,8 +35,11 @@ class FilterRepository {
         $router = $internalRouter;
 
         /* @var $reverseFilterFactories FilterFactoryInterface[] */
-        foreach ($reverseFilterFactories as $factories) {
-            $router = $factories->getFilter($router, $controller, $action);
+        foreach ($reverseFilterFactories as $factory) {
+            $newRouter = $factory->getFilter($router, $controller, $action);
+            if ($newRouter !== null) {
+                $router = $newRouter;
+            }
         }
 
         return $router;

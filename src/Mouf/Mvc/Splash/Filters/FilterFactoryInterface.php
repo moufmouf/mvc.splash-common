@@ -16,7 +16,7 @@ interface FilterFactoryInterface
 	 * @param HttpKernelInterface $app The kernel your middleware will be wrapping.
 	 * @param object $controller The controller
 	 * @param string $action The action of the controller
-	 * @return HttpKernelInterface
+	 * @return HttpKernelInterface|null
 	 */
 	public function getFilter(HttpKernelInterface $app, $controller, $action);
 }
