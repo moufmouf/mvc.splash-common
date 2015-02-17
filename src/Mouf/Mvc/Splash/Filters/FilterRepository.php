@@ -7,7 +7,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * This class is in charge of registering all filters that will apply to a request handled by Splash.
  */
-class FilterRepository {
+class FilterRepository
+{
 
     /**
      * @var FilterFactoryInterface[]
@@ -24,12 +25,13 @@ class FilterRepository {
     }
 
     /**
-     * @param SplashInternalRouter $internalRouter
+     * @param  SplashInternalRouter $internalRouter
      * @param $controller
      * @param $action
      * @return HttpKernelInterface
      */
-    public function getFilteredInternalRouter(SplashInternalRouter $internalRouter, $controller, $action) {
+    public function getFilteredInternalRouter(SplashInternalRouter $internalRouter, $controller, $action)
+    {
         $reverseFilterFactories = array_reverse($this->filterFactories);
 
         $router = $internalRouter;

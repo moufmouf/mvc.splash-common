@@ -3,9 +3,9 @@
 
 <script type="text/javascript">
 globalData = <?php echo json_encode(array(
-	"sourceDirectory"=>$this->sourceDirectory,
-	"namespace"=>$this->controllerNamespace,
-	"tdbmExists"=>file_exists(ROOT_PATH.'../database.tdbm')
+    "sourceDirectory" => $this->sourceDirectory,
+    "namespace" => $this->controllerNamespace,
+    "tdbmExists" => file_exists(ROOT_PATH.'../database.tdbm'),
 )); ?>
 </script>
 
@@ -13,10 +13,12 @@ globalData = <?php echo json_encode(array(
 <form ng-submit="submit()" class="form-horizontal" ng-controller="CreateControllerCtrl">
 <input type="hidden" id="selfedit" name="selfedit" value="<?php echo plainstring_to_htmlprotected($this->selfedit) ?>" />
 
-<?php if (!$this->autoloadDetected) { ?>
+<?php if (!$this->autoloadDetected) {
+    ?>
 <div class="alert">Warning! Splash could not detect the autoload section of your <code>composer.json</code> file.
 Unless you are developing your own autoload system, you should configure <code>composer.json</code> to <a href="http://getcomposer.org/doc/01-basic-usage.md#autoloading" target="_blank">define a source directory and a root namespace using PSR-0</a>.</div>
-<?php } ?>
+<?php 
+} ?>
 
 <div class="control-group" ng-class="{error:controllerNameError}">
 	<label class="control-label" for="controllerclass">Controller class name:</label>
@@ -100,7 +102,7 @@ Unless you are developing your own autoload system, you should configure <code>c
 		    </label>
 		</div>
 	</div>
-	
+
 	<div class="control-group">
 		<label class="control-label">Method name:</label>
 		<div class="controls">
@@ -108,20 +110,20 @@ Unless you are developing your own autoload system, you should configure <code>c
 			<span class="help-block">The name of the method for this action.</span>
 		</div>
 	</div>
-	
+
 	<div class="control-group">
 		<label class="control-label">Parameters:</label>
 		<div class="controls">
 			<div class="well" ng-repeat="parameter in action.parameters">
 				<a href="" ng-click="removeParameter(action, parameter)" class="btn btn-danger pull-right"><i class="icon-remove-sign icon-white"></i> Remove</a>
-			
+
 				<div class="control-group">
 					<label class="control-label">Name:</label>
 					<div class="controls">
 						<input type="text" ng-model="parameter.name" />
 					</div>
 				</div>
-				
+
 				<div class="control-group">
 					<label class="control-label">Type:</label>
 					<div class="controls">
@@ -134,29 +136,29 @@ Unless you are developing your own autoload system, you should configure <code>c
 						</select>
 					</div>
 				</div>
-				
+
 				<div class="control-group">
 					<label class="control-label">Optionnal:</label>
 					<div class="controls">
 						<input type="checkbox" ng-model="parameter.optionnal" />
 					</div>
 				</div>
-				
+
 				<div class="control-group" ng-show="parameter.optionnal">
 					<label class="control-label">Default value:</label>
 					<div class="controls">
 						<input type="text" ng-model="parameter.defaultValue" />
 					</div>
-				</div>							
-				
+				</div>
+
 			</div>
-			
+
 			<a href="" ng-click="addParameter(action)" class="btn btn-success"><i class="icon-plus-sign icon-white"></i> Add parameter</a>
-		
+
 		</div>
-				
+
 	</div>
-	
+
 	<div class="control-group">
 		<label class="control-label">Response:</label>
 		<div class="controls">
@@ -177,7 +179,7 @@ Unless you are developing your own autoload system, you should configure <code>c
 		    </label>
 		</div>
 	</div>
-	
+
 	<div class="control-group" ng-show="action.view == 'twig'" ng-class="{error:action.twigTemplateFileError}">
 		<label class="control-label">Twig template file:</label>
 		<div class="controls">
@@ -198,7 +200,7 @@ Unless you are developing your own autoload system, you should configure <code>c
 			<input type="text" ng-model="action.redirect" class="input-xxlarge" /><span class="help-inline" ng-show="action.redirectError">{{action.redirectError}}</span>
 		</div>
 	</div>
-	
+
 </fieldset>
 
 <div class="form-actions">
